@@ -111,34 +111,32 @@ export default {
 }
 </style>
 <style scoped>
+.container {
+  padding-top: 20px !important;
+}
 .v-card {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  background: #0069ff;
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-size: 14px !important;
 }
 
 .box-container {
-  padding: 40px;
-  margin: 0 auto;
-  max-width: 400px;
+  padding: 40px !important;
+  margin: 0 auto !important;
+  max-width: 400px !important;
 }
 
 .heading {
-  text-align: center;
-  font-weight: 300;
-  color: #444;
-  margin: 0 auto 45px;
-  font-size: 35px;
-  line-height: 38px;
-  text-transform: none;
-  letter-spacing: 0;
+  text-align: center !important;
+  font-weight: 300 !important;
+  color: #444 !important;
+  margin: 0 auto 45px !important;
+  font-size: 35px !important;
+  line-height: 38px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
 }
 
 .center {
-  text-align: center;
-}
-.primary {
-  background-color: #2196f3 !important;
-  border-color: #2196f3 !important;
+  text-align: center !important;
 }
 </style>

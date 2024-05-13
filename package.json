@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@lottiefiles/lottie-player": "^2.0.4",
+    "@mdi/font": "^7.4.47",
     "axios": "^1.6.8",
     "core-js": "^3.8.3",
     "eslint-config-prettier": "^9.1.0",

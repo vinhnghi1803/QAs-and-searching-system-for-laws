@@ -83,104 +83,103 @@ export default {
 </style>
 <style scoped>
 .loginsuccess-container {
-  padding: 20px;
-  margin: 0 auto;
-  width: 80%;
-  box-shadow: beige;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #fff;
-  word-break: break-all;
+  padding: 20px !important;
+  margin: 0 auto !important;
+  width: 80% !important;
+  box-shadow: beige !important;
+  border: 1px solid #ccc !important;
+  border-radius: 5px !important;
+  background: #fff !important;
+  word-break: break-all !important;
 }
 .main-container {
-  margin-top: 10%;
+  margin-top: 10% !important;
 }
 .box-container {
-  padding: 20px;
-  margin: 0 auto;
-  width: 400px;
-  box-shadow: beige;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background: #fff;
+  padding: 20px !important;
+  margin: 0 auto !important;
+  width: 400px !important;
+  box-shadow: beige !important;
+  border: 1px solid #ccc !important;
+  border-radius: 5px !important;
+  background: #fff !important;
 }
 .heading {
-  text-align: center;
-  font-weight: 300;
-  color: #444;
-  margin: 0 auto 45px;
-  font-size: 35px;
-  line-height: 38px;
-  text-transform: none;
-  letter-spacing: 0;
+  text-align: center !important;
+  font-weight: 300 !important;
+  color: #444 !important;
+  margin: 0 auto 45px !important;
+  font-size: 35px !important;
+  line-height: 38px !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
 }
 .form-fields,
 .form-fields button {
-  width: 100%;
-  margin: 5px 0;
-  line-height: 28px;
-  border-radius: 5px;
+  width: 100% !important;
+  margin: 5px 0 !important;
+  line-height: 28px !important;
+  border-radius: 5px !important;
 }
 .form-fields input {
-  width: 100%;
-  line-height: 40px;
-  border-radius: 5px;
-  border-radius: 5px;
-  border: 1px solid #f1f1f1;
-  background: #fff;
-  padding: 0 5px;
-  font-size: 14px;
+  width: 100% !important;
+  line-height: 40px !important;
+  border-radius: 5px !important;
+  border-radius: 5px !important;
+  border: 1px solid #f1f1f1 !important;
+  background: #fff !important;
+  padding: 0 5px !important;
+  font-size: 14px !important;
 }
 .signIn {
-  padding: 10px 32px;
-  color: white;
-  font-size: 16px;
-  font-weight: 400;
-  background: #15cd72;
-  text-align: center;
-  cursor: pointer;
-  height: auto;
-  -webkit-appearance: none;
+  padding: 10px 32px !important;
+  color: white !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  background: #15cd72 !important;
+  text-align: center !important;
+  cursor: pointer !important;
+  height: auto !important;
 }
 .createaccount {
-  padding: 15px;
-  background-color: #0069ff;
-  border: none;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 400;
-  height: 48px;
-  line-height: 48px;
-  padding: 0 32px;
-  text-align: center;
-  border-radius: 5px;
+  padding: 15px !important;
+  background-color: #0069ff !important;
+  border: none !important;
+  color: #fff !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  height: 48px !important;
+  line-height: 48px !important;
+  padding: 0 32px !important;
+  text-align: center !important;
+  border-radius: 5px !important;
 }
 .center {
-  text-align: center;
+  text-align: center !important;
 }
 .login-choice span {
-  color: #5b6987;
-  display: -ms-grid;
-  display: grid;
-  font-size: 16px;
-  width: 100%;
-  line-height: 40px;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  text-align: center;
-  -ms-grid-columns: minmax(20px, 1fr) auto minmax(20px, 1fr);
-  grid-template-columns: minmax(20px, 1fr) auto minmax(20px, 1fr);
-  grid-gap: 19px;
+  color: #5b6987 !important;
+  display: -ms-grid !important;
+  display: grid !important;
+  font-size: 16px !important;
+  width: 100% !important;
+  line-height: 40px !important;
+  -webkit-box-align: center !important;
+  -ms-flex-align: center !important;
+  align-items: center !important;
+  text-align: center !important;
+  -ms-grid-columns: minmax(20px, 1fr) auto minmax(20px, 1fr) !important;
+  grid-template-columns: minmax(20px, 1fr) auto minmax(20px, 1fr) !important;
+  grid-gap: 19px !important;
 }
 .login-choice span:after,
 .login-choice span:before {
-  content: '';
-  border-top: 1px solid #e5e8ed;
+  content: '' !important;
+  border-top: 1px solid #e5e8ed !important;
 }
 .footer,
 .footer a {
-  text-align: center;
-  color: #fff;
+  text-align: center !important;
+  color: #fff !important;
 }
 </style>
