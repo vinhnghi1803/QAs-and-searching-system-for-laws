@@ -2,7 +2,7 @@
   <div class="home">
     <h1>Welcome Home!</h1>
     <p>This is your personal home page.</p>
-    <p v-if="user">Hi, {{ user.displayName }}!</p>
+    <p v-if="user">Hi, {{ user.email }}!</p>
   </div>
 </template>
 

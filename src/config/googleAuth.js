@@ -16,11 +16,13 @@ export async function getGoogleUserInfo(signupData, googleLogin, accessToken) {
     signupData.email = responseData.emailAddresses?.[0].value || ''
     signupData.phone = responseData.phoneNumbers?.[0].canonicalForm || ''
 
-    const { day, month, year } = responseData.birthdays?.[0].date || ''
-    signupData.birthdays = `${day}/${month}/${year}` || ''
+    const { day, month, year } = responseData.birthdays?.[0].date
+    signupData.birthdays = parseDate(day, month, year)
+    // const { day, month, year } = responseData.birthdays?.[0].date || ''
+    // signupData.birthdays = `${day}/${month}/${year}`
 
-    signupData.gender = responseData.genders?.[0].formattedValue || ''
-    signupData.address = responseData.addresses?.[0].formattedValue || ''
+    signupData.genders = responseData.genders?.[0].formattedValue || ''
+    signupData.addresses = responseData.addresses?.[0].formattedValue || ''
 
     //Sometime login user have this but it disapear with no info
     signupData.locales = responseData.locales?.[0].value || ''
@@ -41,4 +43,10 @@ export async function decodeGoogleIDToken(token) {
   )
 
   return JSON.parse(jsonPayload)
+}
+
+export function parseDate(day, month, year) {
+  const birthdays = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
+  console.log(new Date(birthdays - new Date().getTimezoneOffset() * 60000).toISOString().substr(0, 10))
+  return new Date(birthdays - new Date().getTimezoneOffset() * 60000).toISOString().substr(0, 10)
 }

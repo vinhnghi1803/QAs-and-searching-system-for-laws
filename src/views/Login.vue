@@ -1,48 +1,84 @@
 <template>
-  <div class="main-container">
-    <form>
-      <div class="box-container">
-        <h2 class="heading">Sign In</h2>
-        <div class="form-fields">
-          <input id="email" name="email" type="text" placeholder="Email Address" />
-        </div>
-        <div class="form-fields">
-          <input id="password" name="password" type="text" placeholder="Password" />
-        </div>
-        <div class="form-fields">
-          <button class="signIn" name="commit" type="submit">Sign In</button>
-        </div>
+  <v-container class="main-container">
+    <v-form ref="form" @submit.prevent="submitForm">
+      <v-card class="box-container">
+        <v-card-title class="heading">Sign In</v-card-title>
+
+        <v-text-field v-model="email" label="Email Address" outlined :rules="emailRules" required></v-text-field>
+        <v-text-field v-model="password" label="Password" type="password" outlined :rules="passwordRules" required></v-text-field>
+
+        <v-btn class="signIn" type="submit" color="success">Sign In</v-btn>
+
         <div class="login-choice"><span>or Sign In with</span></div>
         <SocialLogin />
-      </div>
-    </form>
+      </v-card>
+    </v-form>
+
     <div class="footer">
-      <p>Don't have an account? <a href="/signup"> Create one now</a></p>
+      <p>Don't have an account? <router-link to="/signup"> Create one now</router-link></p>
     </div>
-  </div>
+  </v-container>
 </template>
 
 <script>
 import SocialLogin from '@/components/SocialLogin'
+import axios from 'axios'
+import store from '@/store/store'
+
 export default {
   name: 'login',
   components: {
     SocialLogin
   },
+  data() {
+    return {
+      email: '',
+      password: ''
+    }
+  },
+  computed: {
+    emailRules() {
+      return [(v) => !!v || 'E-mail is required', (v) => /.+@.+\..+/.test(v) || 'E-mail must be valid']
+    },
+    passwordRules() {
+      return [(v) => !!v || 'Password is required', (v) => (v && v.length >= 6) || 'Password must be at least 6 characters']
+    }
+  },
+  methods: {
+    async submitForm() {
+      if (await this.$refs.form.validate()) {
+        try {
+          let result = await axios.post('http://localhost:8080/api/auth/signin', {
+            email: this.email,
+            password: this.password
+          })
+          if (result.status == 200 && result.data) {
+            store.commit('setLoginUser', result.data)
+            this.$router.push({ name: 'Home' })
+            console.log('Login successful', result.data)
+          } else {
+            console.error('Login failed', result)
+          }
+        } catch (error) {
+          console.error('Login failed', error)
+        }
+      }
+    }
+  },
   mounted() {
-    document.body.classList.add('login-body')
+    document.getElementById('app').classList.add('background-class')
+    document.body.classList.add('background-class')
   },
   beforeDestroy() {
-    document.body.classList.remove('login-body')
+    document.getElementById('app').classList.remove('background-class')
+    document.body.classList.remove('background-class')
   }
 }
 </script>
 
 <style>
-.login-body {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  background: #0069ff;
+.background-class {
+  background-color: #0069ff !important;
 }
 </style>
 <style scoped>

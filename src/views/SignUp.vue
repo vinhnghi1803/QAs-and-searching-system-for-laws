@@ -3,19 +3,21 @@
     <v-form ref="signupData">
       <v-card class="box-container">
         <v-card-title class="heading">{{ title }}</v-card-title>
-        <v-text-field v-model="signupData.fullName" label="Full name" outlined></v-text-field>
-        <v-text-field v-model="signupData.email" label="Email" type="email" outlined></v-text-field>
-        <v-text-field v-model="signupData.password" label="Password" type="password" outlined></v-text-field>
+
+        <v-text-field v-model="signupData.fullName" label="Full name" outlined :rules="fullNameRules" required></v-text-field>
+        <v-text-field v-model="signupData.email" label="Email" type="email" outlined :rules="emailRules" required></v-text-field>
+        <v-text-field v-model="signupData.password" label="Password" type="password" outlined :rules="passwordRules" required></v-text-field>
+
         <v-text-field v-model="signupData.phone" label="Phone" outlined></v-text-field>
-        <v-text-field v-model="signupData.birthdays" label="Birthdays" outlined></v-text-field>
-        <v-text-field v-model="signupData.address" label="Address" outlined></v-text-field>
-        <select v-model="signupData.gender" style="margin-bottom: 20px">
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-          <option value="Other">Other</option>
-        </select>
-        <br />
-        <v-btn class="createaccount" @click="submitForm" color="primary">{{ buttonText }}</v-btn>
+        <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field v-model="signupData.birthdays" label="Birthday" outlined readonly v-bind="attrs" v-on="on"></v-text-field>
+          </template>
+          <v-date-picker v-model="signupData.birthdays" @input="menu = false" no-title scrollable></v-date-picker>
+        </v-menu>
+        <v-text-field v-model="signupData.addresses" label="Address" outlined></v-text-field>
+        <v-select v-model="signupData.genders" :items="gender" label="Gender" outlined></v-select>
+        <v-btn class="createaccount" @click="submitForm" depressed color="primary">{{ buttonText }}</v-btn>
         <div>
           <p class="center" v-if="!googleLogin">
             By signing up you agree to the
@@ -34,17 +36,18 @@ export default {
   name: 'signup',
   data() {
     return {
+      gender: ['Male', 'Female', 'Other'],
       signupData: {
         fullName: '',
         email: '',
         password: '',
         phone: '',
-        birthdays: '',
-        gender: 'Male',
-        address: ''
+        birthdays: null,
+        genders: 'Male',
+        addresses: ''
       },
       googleLogin: false,
-      genders: ['Male', 'Female', 'Other']
+      menu: false
     }
   },
   computed: {
@@ -53,11 +56,29 @@ export default {
     },
     buttonText() {
       return this.$route.query.google_login ? 'Create Account' : 'Create your account'
+    },
+    fullNameRules() {
+      return [(v) => !!v || 'Full name is required', (v) => (v && v.length >= 3) || 'Full name must be at least 3 characters']
+    },
+    emailRules() {
+      return [(v) => !!v || 'E-mail is required', (v) => /.+@.+\..+/.test(v) || 'E-mail must be valid']
+    },
+    passwordRules() {
+      return [(v) => !!v || 'Password is required', (v) => (v && v.length >= 6) || 'Password must be at least 6 characters']
     }
   },
   methods: {
-    submitForm() {
-      // Handle form submission
+    async submitForm() {
+      // Validate the form data
+      const valid = await this.$refs.signupData.validate()
+
+      if (valid) {
+        console.log(this.signupData)
+      }
+      // else {
+      //   // If the form is not valid, show an error message or take appropriate action
+      //   console.error('Form validation failed. Please check your input.')
+      // }
     }
   },
   created() {
@@ -65,25 +86,32 @@ export default {
     this.googleLogin = this.$route.query.google_login
   },
   async mounted() {
-    document.body.classList.add('login-body')
-
+    document.getElementById('app').classList.add('background-class')
+    document.body.classList.add('background-class')
     this.googleLogin = this.$route.query.google_login
 
     let GoogleToken = sessionStorage.getItem('GoogleToken')
-    let accessToken = JSON.parse(GoogleToken).accessToken
-    console.log(accessToken)
-    console.log(this.googleLogin)
+    if (GoogleToken) {
+      let accessToken = JSON.parse(GoogleToken).accessToken
+      console.log(accessToken)
+      console.log(this.googleLogin)
 
-    await getGoogleUserInfo(this.signupData, this.googleLogin, accessToken)
+      await getGoogleUserInfo(this.signupData, this.googleLogin, accessToken)
+    }
   },
   beforeDestroy() {
-    document.body.classList.remove('login-body')
+    document.getElementById('app').classList.remove('background-class')
+    document.body.classList.remove('background-class')
   }
 }
 </script>
-
+<style>
+.background-class {
+  background-color: #0069ff !important;
+}
+</style>
 <style scoped>
-.login-body {
+.v-card {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 14px;
   background: #0069ff;
@@ -108,5 +136,9 @@ export default {
 
 .center {
   text-align: center;
+}
+.primary {
+  background-color: #2196f3 !important;
+  border-color: #2196f3 !important;
 }
 </style>
