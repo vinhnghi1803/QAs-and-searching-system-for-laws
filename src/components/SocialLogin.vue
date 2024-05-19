@@ -58,10 +58,15 @@ export default {
 
         // Store the refresh token in session storage
         sessionStorage.setItem('GoogleToken', JSON.stringify(token))
-
-        const response = await axios.post('http://localhost:8080/api/auth/existsByEmail', {
-          email: user.email
+        console.log(user.email)
+        console.log(typeof user.email)
+        const response = await axios.get('http://localhost:8080/api/auth/existsByEmail', {
+          params: {
+            email: user.email
+          }
         })
+        console.log(response)
+        //here
         if (response.data) {
           this.$store.commit('setLoginUser', user)
           this.$router.push('/home')

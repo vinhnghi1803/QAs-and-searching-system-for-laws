@@ -93,6 +93,7 @@ export default {
   word-break: break-all !important;
 }
 .main-container {
+  max-width: 100%;
   margin-top: 10% !important;
 }
 .box-container {

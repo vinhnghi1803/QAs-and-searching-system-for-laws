@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-form ref="signupData">
+    <v-form ref="signupData" @submit.prevent="submitForm">
       <v-card class="box-container">
         <v-card-title class="heading">{{ title }}</v-card-title>
 
@@ -32,6 +32,9 @@
 
 <script>
 import { getGoogleUserInfo } from '@/config/googleAuth'
+import axios from 'axios'
+import store from '@/store/store'
+
 export default {
   name: 'signup',
   data() {
@@ -71,9 +74,31 @@ export default {
     async submitForm() {
       // Validate the form data
       const valid = await this.$refs.signupData.validate()
+      let RegistrationSource = this.$route.query.google_login ? 'Google' : 'Local'
 
       if (valid) {
-        console.log(this.signupData)
+        try {
+          let result = await axios.post('http://localhost:8080/api/auth/signup', {
+            fullname: this.signupData.fullName,
+            email: this.signupData.email,
+            password: this.signupData.password,
+            phone: this.signupData.phone,
+            birthdays: this.signupData.birthdays,
+            genders: this.signupData.genders,
+            addresses: this.signupData.addresses,
+            registrationSources: RegistrationSource
+          })
+          if (result.status == 200 && result.data) {
+            store.commit('setLoginUser', result.data)
+            this.$router.push({ name: 'Home' })
+            console.log('Login successful', result.data)
+          }
+          // else {
+          //   console.error('Login failed', result)
+          // }
+        } catch (error) {
+          console.error('Login failed', error)
+        }
       }
       // else {
       //   // If the form is not valid, show an error message or take appropriate action
@@ -113,6 +138,7 @@ export default {
 <style scoped>
 .container {
   padding-top: 20px !important;
+  max-width: 100%;
 }
 .v-card {
   font-family: Arial, Helvetica, sans-serif !important;
