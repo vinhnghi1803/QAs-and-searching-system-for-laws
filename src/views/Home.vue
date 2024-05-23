@@ -1,49 +1,54 @@
 <template>
-  <v-app>
-    <v-navigation-drawer app v-model="drawer" color="grey lighten-4">
-      <v-system-bar></v-system-bar>
-      <v-btn class="my-2" fab dark small color="teal darken-2" @click="createSession()">
-        <v-icon size="30px" dark>mdi-plus </v-icon>
-      </v-btn>
-      <v-divider></v-divider>
-      <v-list rounded>
-        <v-list-item-group v-model="selectedItem" color="primary">
+  <v-app id="inspire">
+    <v-app-bar app clipped-right flat height="72" color="grey darken-4" dark>
+      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-toolbar-title>Travel Assistant</v-toolbar-title>
+
+      <v-spacer></v-spacer>
+
+      <logout-button />
+    </v-app-bar>
+
+    <v-navigation-drawer dark v-model="drawer" app width="250" class="grey darken-4">
+      <v-sheet height="100" width="100%" class="pt-8 grey darken-4" style="display: flex; justify-content: center; align-items: center">
+        <v-btn elevation="10" rounded class="ma-2" dark @click="createSession()"> <v-icon dark left size="30px"> mdi-plus </v-icon>New chat </v-btn>
+      </v-sheet>
+
+      <v-list>
+        <v-list-item-group v-model="selectedItem">
           <v-list-item v-for="(session, index) in sortedSessions" :key="index" @click="selectSession(session)">
+            <v-list-item-icon>
+              <v-icon>mdi-message-outline</v-icon>
+            </v-list-item-icon>
             <v-list-item-content>
-              <v-list-item-title>{{ session.title ? session.title : 'Not set title yet' }}</v-list-item-title>
+              <v-list-item-title class="text-left">{{ session.title ? session.title : 'Not set title yet' }}</v-list-item-title>
             </v-list-item-content>
+            <Menu></Menu>
           </v-list-item>
         </v-list-item-group>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar app color="indigo" dark fixed>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Chat UI</v-toolbar-title>
-    </v-app-bar>
-    <v-content>
+
+    <v-main class="grey darken-4">
       <v-container fluid class="d-flex flex-column">
         <!-- Chat messages area -->
         <v-row justify="center" class="flex-grow-1">
           <v-col cols="12" sm="10" md="8">
-            <v-card class="overflow-y-auto grey darken-4">
+            <v-card class="grey darken-4">
               <v-card-text class="grey darken-4">
                 <v-list class="grey darken-4">
-                  <v-list-item
-                    v-for="(message, i) in messages"
-                    :key="i"
-                    :class="[message.from === 'user' ? 'grey darken-1 rounded pr-2' : 'grey darken-4 pa-2']"
-                  >
+                  <v-list-item v-for="(message, i) in messages" :key="i" class="pa-2">
                     <v-list-item-content>
-                      <v-row align="center">
-                        <v-col cols="auto">
+                      <v-row no-gutters align="start">
+                        <v-col cols="auto" class="mr-3">
                           <!-- Conditionally render the icon if message is from the bot -->
-                          <v-icon v-if="message.from !== 'user'" class="mr-2" dark>mdi-robot-confused</v-icon>
+                          <v-icon v-if="message.from !== 'user'" dark>mdi-robot-confused</v-icon>
+                          <v-avatar v-else size="30" color="green darken-2" dark>
+                            <span class="white--text">{{ getInitials() }}</span>
+                          </v-avatar>
                         </v-col>
                         <v-col>
-                          <v-list-item-title
-                            :class="[message.from === 'user' ? 'text-right' : 'text-left', 'white--text']"
-                            style="white-space: pre-wrap"
-                          >
+                          <v-list-item-title class="white--text text-left" style="white-space: normal">
                             {{ message.text }}
                           </v-list-item-title>
                         </v-col>
@@ -56,26 +61,48 @@
           </v-col>
         </v-row>
       </v-container>
-    </v-content>
-    <!-- Input field -->
-    <v-row justify="center" class="fixed-bottom">
-      <v-col cols="12" sm="10" md="8">
-        <v-text-field filled v-model="newMessage" placeholder="Type your message..." @keyup.enter="sendMessage" outlined></v-text-field>
-      </v-col>
-    </v-row>
+    </v-main>
+
+    <v-footer app color="transparent" height="72" inset class="grey darken-4">
+      <v-row justify="center">
+        <v-col cols="12" sm="10" md="8">
+          <!-- <v-text-field background-color="grey lighten-1" dense flat hide-details rounded solo></v-text-field> -->
+          <v-textarea
+            background-color="grey darken-2"
+            v-model="newMessage"
+            placeholder="Type your message..."
+            auto-grow
+            rows="1"
+            reverse
+            hide-details
+            @keyup.enter="sendMessage"
+            flat
+            rounded
+            solo
+            dark
+          ></v-textarea>
+        </v-col>
+      </v-row>
+    </v-footer>
   </v-app>
 </template>
 
 <script>
 import store from '@/store/store'
 import axios from 'axios'
+import LogoutButton from '@/components/LogoutButton.vue'
+import Menu from '@/components/Menu.vue'
 export default {
+  components: {
+    LogoutButton,
+    Menu
+  },
   data() {
     return {
-      drawer: false,
+      drawer: null,
       selectedItem: 0,
       sessions: [],
-      messages: [{ text: 'Hi there! How can I help you?', from: 'bot' }],
+      messages: [{ text: 'Welcome to the AI travel assistant! How can I help you with your travel plans today?', from: 'bot' }],
       newMessage: ''
     }
   },
@@ -87,6 +114,10 @@ export default {
         this.selectSession(this.sortedSessions[0])
       }
     })
+    this.scrollToBottom()
+  },
+  updated() {
+    this.scrollToBottom()
   },
   computed: {
     sortedSessions() {
@@ -133,7 +164,7 @@ export default {
             this.messages.push({ text: conversation.response, from: 'bot' })
           }
         } else {
-          this.messages = [{ text: 'Hi there! How can I help you?', from: 'bot' }]
+          this.messages = [{ text: 'Welcome to the AI travel assistant! How can I help you with your travel plans today?', from: 'bot' }]
         }
       } catch (error) {
         console.error('Error fetching messages:', error)
@@ -141,9 +172,12 @@ export default {
     },
     selectSession(session) {
       // Handle selection of session
-      console.log('List session:', this.sortedSessions)
-      console.log('Selected session:', session)
-      this.fetchMessages(session.id)
+      // console.log('List session:', this.sortedSessions)
+      // console.log('Selected session:', session)
+      // this.fetchMessages(session.id)
+      this.fetchMessages(session.id).then(() => {
+        this.scrollToBottom()
+      })
     },
     async sendMessage() {
       const user = store.getters.getLoginUserInfo
@@ -166,10 +200,11 @@ export default {
           }
         )
         this.messages.push({ text: result.data.response, from: 'bot' })
-        this.$nextTick(() => {
-          // Automatically scroll to the bottom of the chat window
-          window.scrollTo(0, document.body.scrollHeight)
-        })
+        // this.$nextTick(() => {
+        //   // Automatically scroll to the bottom of the chat window
+        //   window.scrollTo(0, document.body.scrollHeight)
+        // })
+        this.scrollToBottom()
       }
     },
     async createSession() {
@@ -183,45 +218,35 @@ export default {
         console.log(response)
         this.sessions.push(response.data)
         this.selectedItem = 0
-        this.messages = [{ text: 'Hi there! How can I help you?', from: 'bot' }]
+        this.messages = [{ text: 'Welcome to the AI travel assistant! How can I help you with your travel plans today?', from: 'bot' }]
       } catch (error) {
         console.error('Error creating session:', error)
       }
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        // Automatically scroll to the bottom of the chat window
+        window.scrollTo(0, document.body.scrollHeight)
+      })
+    },
+    getInitials() {
+      const user = store.getters.getLoginUserInfo
+      console.log(user.username.slice(0, 1))
+      return user.username.slice(0, 1).toUpperCase()
     }
   }
 }
 </script>
 
 <style scoped>
-header {
-  height: 64px !important;
-}
-.v-main {
-  margin-top: 64px !important;
-  margin-bottom: 70px !important;
-
-  .container {
-    height: 100% !important;
-
-    .v-card {
-      height: 100% !important;
-    }
-
-    /* .v-list-item__content {
-      word-wrap: break-word;
-    } */
+.container {
+  .v-sheet.v-card:not(.v-sheet--outlined) {
+    box-shadow: none;
   }
 }
-.v-sheet.v-card {
-  padding: 5px !important;
-}
-.overflow-y-auto {
-  overflow-y: auto;
-}
-.fixed-bottom {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+.v-navigation-drawer {
+  .v-btn {
+    text-transform: none;
+  }
 }
 </style>

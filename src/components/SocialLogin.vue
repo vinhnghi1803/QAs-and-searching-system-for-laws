@@ -49,11 +49,14 @@ export default {
         const result = await firebase.auth().signInWithPopup(provider)
         const user = result.user
         console.log(result)
+        console.log(result.user.getIdToken())
+        console.log(await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true))
         // console.log(result.credential)
         const token = {
           providerId: result.credential.providerId,
           accessToken: result.credential.accessToken,
-          idToken: result.credential.idToken
+          idToken: result.credential.idToken,
+          idTokenFireBase: await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true)
         }
 
         // Store the refresh token in session storage
@@ -65,14 +68,36 @@ export default {
             email: user.email
           }
         })
-        console.log(response)
+
         //here
         if (response.data) {
-          this.$store.commit('setLoginUser', user)
-          this.$router.push('/home')
+          try {
+            // Verify the token after successful Google login
+            const tokenVerificationResult = await this.verifyToken(token.idTokenFireBase)
+            // Handle token verification result if needed
+            console.log(tokenVerificationResult)
+
+            this.$store.commit('setLoginUser', tokenVerificationResult)
+            this.$router.push('/home')
+          } catch (error) {
+            // Handle token verification error
+            console.error('Error verifying token:', error)
+          }
         } else this.$router.push({ name: 'SignUp', query: { google_login: true } })
       } catch (error) {
         console.error('Error logging in:', error)
+      }
+    },
+    async verifyToken(firebaseToken) {
+      try {
+        const response = await axios.post('http://localhost:8080/api/auth/verifyToken', firebaseToken)
+        // Handle successful response
+        console.log(response.data) // Print response data to console
+        return response.data // Return response data if needed
+      } catch (error) {
+        // Handle error
+        console.error('Error:', error)
+        throw error // Rethrow error for handling in the calling function
       }
     }
   }
