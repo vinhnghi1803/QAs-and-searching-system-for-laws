@@ -11,10 +11,12 @@
 
     <v-navigation-drawer dark v-model="drawer" app width="250" class="grey darken-4">
       <v-sheet height="100" width="100%" class="pt-8 grey darken-4" style="display: flex; justify-content: center; align-items: center">
-        <v-btn elevation="10" rounded class="ma-2" dark @click="createSession()"> <v-icon dark left size="30px"> mdi-plus </v-icon>New chat </v-btn>
+        <v-btn elevation="10" rounded class="ma-2 font-weight-bold" dark @click="createSession()">
+          <v-icon dark left size="30px">mdi-plus</v-icon>New chat
+        </v-btn>
       </v-sheet>
 
-      <v-list>
+      <v-list rounded>
         <v-list-item-group v-model="selectedItem">
           <v-list-item v-for="(session, index) in sortedSessions" :key="index" @click="selectSession(session)">
             <v-list-item-icon>
@@ -23,7 +25,7 @@
             <v-list-item-content>
               <v-list-item-title class="text-left">{{ session.title ? session.title : 'Not set title yet' }}</v-list-item-title>
             </v-list-item-content>
-            <Menu></Menu>
+            <Menu :session="session" @session-updated="fetchUserSessions()"></Menu>
           </v-list-item>
         </v-list-item-group>
       </v-list>
@@ -37,7 +39,7 @@
             <v-card class="grey darken-4">
               <v-card-text class="grey darken-4">
                 <v-list class="grey darken-4">
-                  <v-list-item v-for="(message, i) in messages" :key="i" class="pa-2">
+                  <v-list-item v-for="(message, i) in messages" :key="i" class="pa-2 mb-9">
                     <v-list-item-content>
                       <v-row no-gutters align="start">
                         <v-col cols="auto" class="mr-3">
@@ -49,12 +51,30 @@
                         </v-col>
                         <v-col>
                           <v-list-item-title class="white--text text-left" style="white-space: normal">
-                            {{ message.text }}
+                            <span v-if="message.from === 'user'">{{ message.text }}</span>
+                            <span v-else v-html="message.text"></span>
                           </v-list-item-title>
                         </v-col>
                       </v-row>
                     </v-list-item-content>
                   </v-list-item>
+                  <template v-if="loading">
+                    <v-list-item class="pa-2">
+                      <v-list-item-content>
+                        <lottie-player
+                          :src="OrangeSpin"
+                          style="width: 200px; height: 200px; margin: auto"
+                          background="transparent"
+                          speed="1"
+                          direction="1"
+                          mode="normal"
+                          autoplay
+                          loop
+                        ></lottie-player>
+                        <span class="white--text text-h6">Waiting for respond....</span>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </template>
                 </v-list>
               </v-card-text>
             </v-card>
@@ -89,9 +109,12 @@
 
 <script>
 import store from '@/store/store'
+import '@lottiefiles/lottie-player'
 import axios from 'axios'
 import LogoutButton from '@/components/LogoutButton.vue'
 import Menu from '@/components/Menu.vue'
+import OrangeSpin from '../assets/animation/OrangeSpin.json'
+
 export default {
   components: {
     LogoutButton,
@@ -103,13 +126,13 @@ export default {
       selectedItem: 0,
       sessions: [],
       messages: [{ text: 'Welcome to the AI travel assistant! How can I help you with your travel plans today?', from: 'bot' }],
-      newMessage: ''
+      newMessage: '',
+      loading: false,
+      OrangeSpin: JSON.stringify(OrangeSpin)
     }
   },
   mounted() {
-    // Fetch user sessions from API when component is mounted
     this.fetchUserSessions().then(() => {
-      // After fetching sessions, select the latest session
       if (this.sessions.length > 0) {
         this.selectSession(this.sortedSessions[0])
       }
@@ -127,20 +150,13 @@ export default {
   methods: {
     async fetchUserSessions() {
       try {
-        // Get userID from localStorage
         const user = store.getters.getLoginUserInfo
-        // console.log(user)
-        // Make GET request to API
         const response = await axios.get(`http://localhost:8080/api/chat/sessionList`, {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
         })
-        // Set sessions data
-        // const sortedSessions = response.data.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
-        // console.log(sortedSessions)
         this.sessions = response.data
-        // console.log(this.sessions)
       } catch (error) {
         console.error('Error fetching user sessions:', error)
       }
@@ -153,9 +169,6 @@ export default {
             Authorization: `Bearer ${user.token}`
           }
         })
-        // console.log('Fetched messages:', response.data)
-        // Assuming response.data is an array of messages, update your messages array
-        // this.messages = response.data
         if (response.data.length > 0) {
           this.messages = []
           for (let i = 0; i < response.data.length; i++) {
@@ -171,10 +184,6 @@ export default {
       }
     },
     selectSession(session) {
-      // Handle selection of session
-      // console.log('List session:', this.sortedSessions)
-      // console.log('Selected session:', session)
-      // this.fetchMessages(session.id)
       this.fetchMessages(session.id).then(() => {
         this.scrollToBottom()
       })
@@ -182,29 +191,36 @@ export default {
     async sendMessage() {
       const user = store.getters.getLoginUserInfo
       if (this.newMessage.trim() !== '') {
+        // Set loading state
+        this.loading = true
+
         this.messages.push({ text: this.newMessage, from: 'user' })
         const messageToSend = this.newMessage
         this.newMessage = ''
-        console.log(this.selectedItem)
-
-        const result = await axios.post(
-          'http://localhost:8080/api/chat/message/send',
-          {
-            sessionId: this.sortedSessions[this.selectedItem].id,
-            request: messageToSend
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${user.token}`
+        try {
+          const result = await axios.post(
+            'http://localhost:8080/api/chat/message/send',
+            {
+              sessionId: this.sortedSessions[this.selectedItem].id,
+              request: messageToSend
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${user.token}`
+              }
             }
+          )
+          this.messages.push({ text: result.data.response, from: 'bot' })
+          if (this.messages.length === 3) {
+            await this.fetchUserSessions()
           }
-        )
-        this.messages.push({ text: result.data.response, from: 'bot' })
-        // this.$nextTick(() => {
-        //   // Automatically scroll to the bottom of the chat window
-        //   window.scrollTo(0, document.body.scrollHeight)
-        // })
-        this.scrollToBottom()
+          this.scrollToBottom()
+        } catch (error) {
+          console.error('Error sending message:', error)
+        } finally {
+          // Clear loading state
+          this.loading = false
+        }
       }
     },
     async createSession() {
@@ -215,7 +231,6 @@ export default {
             Authorization: `Bearer ${user.token}`
           }
         })
-        console.log(response)
         this.sessions.push(response.data)
         this.selectedItem = 0
         this.messages = [{ text: 'Welcome to the AI travel assistant! How can I help you with your travel plans today?', from: 'bot' }]
@@ -225,13 +240,11 @@ export default {
     },
     scrollToBottom() {
       this.$nextTick(() => {
-        // Automatically scroll to the bottom of the chat window
         window.scrollTo(0, document.body.scrollHeight)
       })
     },
     getInitials() {
       const user = store.getters.getLoginUserInfo
-      console.log(user.username.slice(0, 1))
       return user.username.slice(0, 1).toUpperCase()
     }
   }

@@ -121,7 +121,7 @@ export default {
   border: 1px solid rgba(0, 105, 255, 0.2);
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
-  border-radius: 3px;
+  border-radius: 20px;
   display: inline-block;
   margin-top: 0;
   width: 47.5%;
@@ -134,7 +134,7 @@ export default {
   text-decoration: none;
 }
 .signup-buttons svg {
-  left: 16px;
+  left: 18px;
   position: absolute;
   top: 50%;
   -webkit-transform: translateY(-50%);

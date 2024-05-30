@@ -1,32 +1,98 @@
 <template>
-  <v-container>
-    <v-form ref="signupData" @submit.prevent="submitForm">
-      <v-card class="box-container">
-        <v-card-title class="heading">{{ title }}</v-card-title>
+  <v-container fluid>
+    <lottie-player
+      :src="Bus"
+      style="width: 200px; height: 160px; margin: auto"
+      background="transparent"
+      speed="1"
+      direction="1"
+      mode="normal"
+      autoplay
+      loop
+    ></lottie-player>
+    <v-row justify="center">
+      <v-col cols="12" sm="8" md="6" lg="4">
+        <v-form ref="signupData" @submit.prevent="submitForm">
+          <v-card rounded="xl" elevation="10" class="pa-7 mx-auto" max-width="500">
+            <v-card-title class="justify-center text-h4 mb-4 font-weight-black blue--text text--lighten-1">{{ title }}</v-card-title>
 
-        <v-text-field v-model="signupData.fullName" label="Full name" outlined :rules="fullNameRules" required></v-text-field>
-        <v-text-field v-model="signupData.email" label="Email" type="email" outlined :rules="emailRules" required></v-text-field>
-        <v-text-field v-model="signupData.password" label="Password" type="password" outlined :rules="passwordRules" required></v-text-field>
+            <v-text-field v-model="signupData.fullName" label="Full name" outlined :rules="fullNameRules" required rounded color="grey darken-2">
+              <template v-slot:prepend>
+                <v-icon style="top: -5px" size="32"> mdi-account-circle </v-icon>
+              </template>
+            </v-text-field>
 
-        <v-text-field v-model="signupData.phone" label="Phone" outlined></v-text-field>
-        <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
-          <template v-slot:activator="{ on, attrs }">
-            <v-text-field v-model="signupData.birthdays" label="Birthday" outlined readonly v-bind="attrs" v-on="on"></v-text-field>
-          </template>
-          <v-date-picker v-model="signupData.birthdays" @input="menu = false" no-title scrollable></v-date-picker>
-        </v-menu>
-        <v-text-field v-model="signupData.addresses" label="Address" outlined></v-text-field>
-        <v-select v-model="signupData.genders" :items="gender" label="Gender" outlined></v-select>
-        <v-btn class="createaccount" @click="submitForm" depressed color="primary">{{ buttonText }}</v-btn>
-        <div>
-          <p class="center" v-if="!googleLogin">
-            By signing up you agree to the
-            <a href="#">Terms of Service</a>.
-          </p>
-          <p class="center" v-else>Please fill this to create an account with our website.</p>
-        </div>
-      </v-card>
-    </v-form>
+            <v-text-field v-model="signupData.email" label="Email" type="email" outlined :rules="emailRules" required rounded color="grey darken-2">
+              <template v-slot:prepend>
+                <v-icon style="top: -5px" size="32"> mdi-email </v-icon>
+              </template>
+            </v-text-field>
+
+            <v-text-field
+              v-model="signupData.password"
+              label="Password"
+              type="password"
+              outlined
+              :rules="passwordRules"
+              required
+              rounded
+              color="grey darken-2"
+            >
+              <template v-slot:prepend>
+                <v-icon style="top: -5px" size="32"> mdi-lock </v-icon>
+              </template>
+            </v-text-field>
+
+            <v-text-field v-model="signupData.phone" label="Phone" outlined rounded color="grey darken-2">
+              <template v-slot:prepend>
+                <v-icon style="top: -5px" size="32"> mdi-phone </v-icon>
+              </template>
+            </v-text-field>
+
+            <v-menu v-model="menu" :close-on-content-click="false" :nudge-right="40" transition="scale-transition" offset-y min-width="auto">
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                  v-model="signupData.birthdays"
+                  label="Birthday"
+                  outlined
+                  readonly
+                  v-bind="attrs"
+                  v-on="on"
+                  rounded
+                  color="grey darken-2"
+                >
+                  <template v-slot:prepend>
+                    <v-icon style="top: -5px" size="32"> mdi-calendar </v-icon>
+                  </template>
+                </v-text-field>
+              </template>
+              <v-date-picker v-model="signupData.birthdays" @input="menu = false" no-title scrollable></v-date-picker>
+            </v-menu>
+
+            <v-text-field v-model="signupData.addresses" label="Address" outlined rounded color="grey darken-2">
+              <template v-slot:prepend>
+                <v-icon style="top: -5px" size="32"> mdi-map-marker </v-icon>
+              </template>
+            </v-text-field>
+            <v-select v-model="signupData.genders" :items="gender" label="Gender" outlined rounded color="grey darken-2">
+              <template v-slot:prepend>
+                <v-icon style="top: -5px" size="32"> mdi-gender-male-female </v-icon>
+              </template>
+            </v-select>
+            <v-btn @click="submitForm" class="mb-5 font-weight-bold text-button white--text" large rounded color="blue lighten-1">{{
+              buttonText
+            }}</v-btn>
+            <div>
+              <p class="center mb-0" v-if="!googleLogin">
+                By signing up you agree to the
+                <a class="text-decoration-none font-weight-bold" href="#">Terms of Service</a>.
+              </p>
+              <p class="center mb-0" v-else>Please fill this to create an account with our website.</p>
+            </div>
+          </v-card>
+        </v-form>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
@@ -34,6 +100,7 @@
 import { getGoogleUserInfo } from '@/config/googleAuth'
 import axios from 'axios'
 import store from '@/store/store'
+import Bus from '../assets/animation/Bus.json'
 
 export default {
   name: 'signup',
@@ -50,7 +117,8 @@ export default {
         addresses: ''
       },
       googleLogin: false,
-      menu: false
+      menu: false,
+      Bus: JSON.stringify(Bus)
     }
   },
   computed: {
@@ -132,37 +200,7 @@ export default {
 </script>
 <style>
 .background-class {
-  background-color: #0069ff !important;
+  background-color: #e3f2fd !important;
 }
 </style>
-<style scoped>
-.container {
-  padding-top: 20px !important;
-  max-width: 100%;
-}
-.v-card {
-  font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 14px !important;
-}
-
-.box-container {
-  padding: 40px !important;
-  margin: 0 auto !important;
-  max-width: 400px !important;
-}
-
-.heading {
-  text-align: center !important;
-  font-weight: 300 !important;
-  color: #444 !important;
-  margin: 0 auto 45px !important;
-  font-size: 35px !important;
-  line-height: 38px !important;
-  text-transform: none !important;
-  letter-spacing: 0 !important;
-}
-
-.center {
-  text-align: center !important;
-}
-</style>
+<style scoped></style>
