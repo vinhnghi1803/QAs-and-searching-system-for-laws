@@ -16,7 +16,7 @@ export async function getGoogleUserInfo(signupData, googleLogin, accessToken) {
     signupData.email = responseData.emailAddresses?.[0].value || ''
     signupData.phone = responseData.phoneNumbers?.[0].canonicalForm || ''
 
-    const { day, month, year } = responseData.birthdays?.[0].date
+    const { day, month, year } = responseData.birthdays?.[0].date || ''
     signupData.birthdays = parseDate(day, month, year)
     // const { day, month, year } = responseData.birthdays?.[0].date || ''
     // signupData.birthdays = `${day}/${month}/${year}`
