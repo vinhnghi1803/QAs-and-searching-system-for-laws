@@ -146,7 +146,7 @@ export default {
 
       if (valid) {
         try {
-          let result = await axios.post(`${process.env.beURL}/api/auth/signup`, {
+          let result = await axios.post(`${process.env.VUE_APP_BE_URL}/api/auth/signup`, {
             fullname: this.signupData.fullName,
             email: this.signupData.email,
             password: this.signupData.password,
