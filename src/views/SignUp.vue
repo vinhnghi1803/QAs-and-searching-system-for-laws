@@ -13,7 +13,7 @@
     <v-row justify="center">
       <v-col cols="12" sm="8" md="6" lg="4">
         <v-form ref="signupData" @submit.prevent="submitForm">
-          <v-card rounded="xl" elevation="10" class="pa-7 mx-auto" max-width="500">
+          <v-card rounded="xl" elevation="10" class="pa-7" max-width="500">
             <v-card-title class="justify-center text-h4 mb-4 font-weight-black blue--text text--lighten-1">{{ title }}</v-card-title>
 
             <v-text-field v-model="signupData.fullName" label="Full name" outlined :rules="fullNameRules" required rounded color="grey darken-2">
@@ -146,7 +146,7 @@ export default {
 
       if (valid) {
         try {
-          let result = await axios.post('http://localhost:8080/api/auth/signup', {
+          let result = await axios.post(`${process.env.beURL}/api/auth/signup`, {
             fullname: this.signupData.fullName,
             email: this.signupData.email,
             password: this.signupData.password,
