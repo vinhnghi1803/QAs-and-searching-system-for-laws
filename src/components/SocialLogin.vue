@@ -63,7 +63,7 @@ export default {
         sessionStorage.setItem('GoogleToken', JSON.stringify(token))
         console.log(user.email)
         console.log(typeof user.email)
-        const response = await axios.get(`${process.env.beURL}/api/auth/existsByEmail`, {
+        const response = await axios.get(`${process.env.VUE_APP_BE_URL}/api/auth/existsByEmail`, {
           params: {
             email: user.email
           }
@@ -90,7 +90,7 @@ export default {
     },
     async verifyToken(firebaseToken) {
       try {
-        const response = await axios.post(`${process.env.beURL}/api/auth/verifyToken`, firebaseToken)
+        const response = await axios.post(`${process.env.VUE_APP_BE_URL}/api/auth/verifyToken`, firebaseToken)
         // Handle successful response
         console.log(response.data) // Print response data to console
         return response.data // Return response data if needed
