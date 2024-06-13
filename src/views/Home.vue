@@ -151,7 +151,7 @@ export default {
     async fetchUserSessions() {
       try {
         const user = store.getters.getLoginUserInfo
-        const response = await axios.get(`${process.env.beURL}/api/chat/sessionList`, {
+        const response = await axios.get(`${process.env.VUE_APP_BE_URL}/api/chat/sessionList`, {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
@@ -164,7 +164,7 @@ export default {
     async fetchMessages(sessionId) {
       try {
         const user = store.getters.getLoginUserInfo
-        const response = await axios.get(`${process.env.beURL}/api/chat/session/${sessionId}/message`, {
+        const response = await axios.get(`${process.env.VUE_APP_BE_URL}/api/chat/session/${sessionId}/message`, {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
@@ -199,7 +199,7 @@ export default {
         this.newMessage = ''
         try {
           const result = await axios.post(
-            `${process.env.beURL}/api/chat/message/send`,
+            `${process.env.VUE_APP_BE_URL}/api/chat/message/send`,
             {
               sessionId: this.sortedSessions[this.selectedItem].id,
               request: messageToSend
@@ -226,7 +226,7 @@ export default {
     async createSession() {
       try {
         const user = store.getters.getLoginUserInfo
-        const response = await axios.post(`${process.env.beURL}/api/chat/session/create`, null, {
+        const response = await axios.post(`${process.env.VUE_APP_BE_URL}/api/chat/session/create`, null, {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
