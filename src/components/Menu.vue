@@ -78,7 +78,7 @@ export default {
       const user = store.getters.getLoginUserInfo
       try {
         await axios.put(
-          `${process.env.beURL}/api/chat/session/rename`,
+          `${process.env.VUE_APP_BE_URL}/api/chat/session/rename`,
           {
             id: this.modifySession.id,
             title: this.modifySession.title
@@ -99,7 +99,7 @@ export default {
     async deleteSession() {
       const user = store.getters.getLoginUserInfo
       try {
-        await axios.delete(`${process.env.beURL}/api/chat/session/delete/${this.modifySession.id}`, {
+        await axios.delete(`${process.env.VUE_APP_BE_URL}/api/chat/session/delete/${this.modifySession.id}`, {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
