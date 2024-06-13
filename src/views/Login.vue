@@ -72,7 +72,7 @@ export default {
     async submitForm() {
       if (await this.$refs.form.validate()) {
         try {
-          let result = await axios.post(`${process.env.beURL}/api/auth/signin`, {
+          let result = await axios.post(`${process.env.VUE_APP_BE_URL}/api/auth/signin`, {
             email: this.email,
             password: this.password
           })
