@@ -13,7 +13,7 @@
     <v-row justify="center">
       <v-col cols="12" sm="8" md="6" lg="4">
         <v-form ref="form" @submit.prevent="submitForm">
-          <v-card rounded="xl" elevation="10" class="pa-7" max-width="500">
+          <v-card rounded="xl" elevation="10" class="pa-7 mx-auto" max-width="500">
             <v-card-title class="justify-center text-h4 mb-4 font-weight-black blue--text text--lighten-1">Sign In</v-card-title>
 
             <v-text-field v-model="email" label="Email Address" outlined :rules="emailRules" required rounded color="grey darken-2">
