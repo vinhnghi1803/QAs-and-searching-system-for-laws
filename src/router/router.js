@@ -7,6 +7,7 @@ import Home from '@/views/Home.vue'
 import Login from '@/views/Login.vue'
 import Animate from '@/views/Animate.vue'
 import SignUp from '@/views/SignUp.vue'
+import Laws from '@/views/laws'
 
 Vue.use(Router)
 
@@ -41,6 +42,14 @@ let routes = [
     path: '/animate',
     name: 'Animate',
     component: Animate,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/laws',
+    name: 'Laws',
+    component: Laws,
     meta: {
       requiresAuth: true
     }

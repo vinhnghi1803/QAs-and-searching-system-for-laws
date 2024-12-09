@@ -1,13 +1,6 @@
 <template>
   <v-app id="inspire">
-    <v-app-bar app clipped-right flat height="72" color="grey darken-4" dark>
-      <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Travel Assistant</v-toolbar-title>
-
-      <v-spacer></v-spacer>
-
-      <logout-button />
-    </v-app-bar>
+    <Header @toggle-drawer="toggleDrawer" title="Laws Assistant" />
 
     <v-navigation-drawer dark v-model="drawer" app width="250" class="grey darken-4">
       <v-sheet height="100" width="100%" class="pt-8 grey darken-4" style="display: flex; justify-content: center; align-items: center">
@@ -111,14 +104,14 @@
 import store from '@/store/store'
 import '@lottiefiles/lottie-player'
 import axios from 'axios'
-import LogoutButton from '@/components/LogoutButton.vue'
+import Header from '@/components/Header.vue'
 import Menu from '@/components/Menu.vue'
 import OrangeSpin from '../assets/animation/OrangeSpin.json'
 
 export default {
   components: {
-    LogoutButton,
-    Menu
+    Menu,
+    Header
   },
   data() {
     return {
@@ -148,6 +141,9 @@ export default {
     }
   },
   methods: {
+    toggleDrawer() {
+      this.drawer = !this.drawer
+    },
     async fetchUserSessions() {
       try {
         const user = store.getters.getLoginUserInfo
