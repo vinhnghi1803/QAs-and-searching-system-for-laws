@@ -67,7 +67,7 @@ export default {
   },
   data() {
     return {
-      drawer: true,
+      drawer: null,
       title: 'Laws Search Engine',
       searchQuery: '',
       selectedCategory: null,
@@ -118,7 +118,7 @@ export default {
       }
     },
     viewLaw(law) {
-      alert(`Xem chi tiết luật: ${law.name}`)
+      this.$router.push({ name: 'LawDetail', params: { id: law.id } })
     },
     async fetchLawsCategories() {
       try {
