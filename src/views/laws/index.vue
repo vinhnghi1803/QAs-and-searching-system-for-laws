@@ -30,14 +30,24 @@
         <v-row justify="center">
           <v-col cols="12" md="8">
             <!-- Search Box -->
-            <v-text-field v-model="searchQuery" label="Tìm kiếm luật" @input="searchLaws" outlined dense></v-text-field>
+            <v-text-field
+              v-model="searchQuery"
+              label="Tìm kiếm luật"
+              outlined
+              dense
+              append-outer-icon="mdi-send"
+              @click:append-outer="searchLaws"
+              :loading="loading"
+              :messages="totalElements > 0 ? `${totalElements} tài liệu liên quan` : ''"
+              class="mb-4"
+            ></v-text-field>
 
             <v-row v-if="laws.length === 0">
-              <v-alert type="info" dark border="left">Không tìm thấy luật nào.</v-alert>
+              <v-alert type="warning" dark border="left">Không tìm thấy tài liệu nào.</v-alert>
             </v-row>
             <v-row v-else class="mb-4" justify="center">
               <v-col cols="12" v-for="law in laws" :key="law.id">
-                <v-card class="law-card" elevation="3" hover>
+                <v-card class="law-card" color="grey lighten-4" elevation="3" hover>
                   <v-card-title class="headline">{{ law.name }}</v-card-title>
                   <v-card-text>{{ law.description }}</v-card-text>
                   <v-card-actions>
@@ -77,7 +87,8 @@ export default {
       pageSize: 10,
       pageCount: 0,
       totalElements: 0,
-      user: store.getters.getLoginUserInfo
+      user: store.getters.getLoginUserInfo,
+      loading: false
     }
   },
   methods: {
@@ -89,27 +100,57 @@ export default {
       this.page = 1
       this.fetchLaws()
     },
+    async searchLaws() {
+      if (!this.searchQuery || this.searchQuery?.trim() === '') return
 
-    searchLaws() {
-      this.page = 1
-      this.fetchLaws()
+      this.selectCategory(this.categories[0])
+
+      const params = {
+        query: this.searchQuery,
+        page: this.page - 1,
+        size: this.pageSize
+      }
+
+      this.loading = true
+
+      try {
+        const response = await axios.get(`${process.env.VUE_APP_BE_URL}/api/docs/search`, {
+          params,
+          headers: {
+            Authorization: `Bearer ${this.user.token}`
+          }
+        })
+
+        // Cập nhật danh sách luật dựa trên kết quả tìm kiếm
+        this.laws = response.data.content
+        this.pageCount = response.data.totalPages
+        this.totalElements = response.data.totalElements
+      } catch (error) {
+        console.error('Error searching laws:', error)
+      }
+      setTimeout(2000)
+      this.loading = false
     },
     async fetchLaws() {
       const params = {
-        page: this.page - 1, // Spring bắt đầu từ 0, Vue bắt đầu từ 1
+        page: this.page - 1,
         size: this.pageSize
       }
 
       try {
-        const response = await axios.get(
-          `${process.env.VUE_APP_BE_URL}/api/docs/category/${this.selectedCategory ? this.selectedCategory.id : 1}/paginated`,
-          {
-            params,
-            headers: {
-              Authorization: `Bearer ${this.user.token}`
-            }
+        let url
+        if (this.selectedCategory && this.selectedCategory.id === 0) {
+          url = `${process.env.VUE_APP_BE_URL}/api/docs`
+        } else {
+          url = `${process.env.VUE_APP_BE_URL}/api/docs/category/${this.selectedCategory.id}/paginated`
+        }
+
+        const response = await axios.get(url, {
+          params,
+          headers: {
+            Authorization: `Bearer ${this.user.token}`
           }
-        )
+        })
         this.laws = response.data.content
         this.pageCount = response.data.totalPages
         this.totalElements = response.data.totalElements
@@ -127,10 +168,9 @@ export default {
             Authorization: `Bearer ${this.user.token}`
           }
         })
-        this.categories = mapCategoryIcons(response.data)
-        // Set default category to the first category
+        this.categories = [{ id: 0, name: 'Xem tất cả', icon: 'mdi-eye' }, ...mapCategoryIcons(response.data)]
         if (this.categories.length > 0) {
-          this.selectCategory(this.categories[0]) // Automatically select the first category
+          this.selectCategory(this.categories[0])
         }
       } catch (error) {
         console.error('Error fetching laws categories:', error)
@@ -165,7 +205,6 @@ export default {
     transform 0.2s ease,
     box-shadow 0.2s ease;
   background-color: #1e1e2f;
-  color: white;
 }
 .law-card:hover {
   transform: translateY(-5px);

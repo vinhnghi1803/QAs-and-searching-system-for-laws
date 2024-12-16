@@ -80,4 +80,7 @@ router.beforeEach((to, from, next) => {
   else next()
 })
 
+router.afterEach((to) => {
+  document.title = to.name || 'AI Assistant'
+})
 export default router

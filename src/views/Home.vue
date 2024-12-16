@@ -118,10 +118,13 @@ export default {
       drawer: null,
       selectedItem: 0,
       sessions: [],
-      messages: [{ text: 'Welcome to the AI travel assistant! How can I help you with your travel plans today?', from: 'bot' }],
+      messages: [
+        { text: 'Xin chào, tôi là Laws AI assistant, tôi có thể giải đáp bất cứ thắc mắc nào về pháp luật Việt Nam hiện hành', from: 'bot' }
+      ],
       newMessage: '',
       loading: false,
-      OrangeSpin: JSON.stringify(OrangeSpin)
+      OrangeSpin: JSON.stringify(OrangeSpin),
+      modelId: 2
     }
   },
   mounted() {
@@ -173,7 +176,9 @@ export default {
             this.messages.push({ text: conversation.response, from: 'bot' })
           }
         } else {
-          this.messages = [{ text: 'Welcome to the AI travel assistant! How can I help you with your travel plans today?', from: 'bot' }]
+          this.messages = [
+            { text: 'Xin chào, tôi là Laws AI assistant, tôi có thể giải đáp bất cứ thắc mắc nào về pháp luật Việt Nam hiện hành', from: 'bot' }
+          ]
         }
       } catch (error) {
         console.error('Error fetching messages:', error)
@@ -198,7 +203,8 @@ export default {
             `${process.env.VUE_APP_BE_URL}/api/chat/message/send`,
             {
               sessionId: this.sortedSessions[this.selectedItem].id,
-              request: messageToSend
+              request: messageToSend,
+              model: this.modelId
             },
             {
               headers: {
@@ -229,7 +235,9 @@ export default {
         })
         this.sessions.push(response.data)
         this.selectedItem = 0
-        this.messages = [{ text: 'Welcome to the AI travel assistant! How can I help you with your travel plans today?', from: 'bot' }]
+        this.messages = [
+          { text: 'Xin chào, tôi là Laws AI assistant, tôi có thể giải đáp bất cứ thắc mắc nào về pháp luật Việt Nam hiện hành', from: 'bot' }
+        ]
       } catch (error) {
         console.error('Error creating session:', error)
       }
