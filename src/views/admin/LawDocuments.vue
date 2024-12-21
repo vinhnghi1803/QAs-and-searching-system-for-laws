@@ -111,8 +111,8 @@ export default {
     },
     updatePageSize(newPageSize) {
       this.pageSize = newPageSize
-      this.page = 1 // Reset về trang đầu tiên khi thay đổi số lượng dòng
-      this.fetchLaws() // Gọi API cập nhật dữ liệu
+      this.page = 1
+      this.fetchLaws()
     },
     openAddLawsDialog() {
       this.$refs.openFileInputDialog.open()
@@ -152,7 +152,7 @@ export default {
     })
   },
   mounted() {
-    this.fetchLaws() // Lấy dữ liệu lần đầu khi component được tạo
+    this.fetchLaws()
   }
 }
 </script>

@@ -5,38 +5,73 @@
       <v-card-title>
         <span class="text-h6">Quản lý tài khoản</span>
         <v-spacer></v-spacer>
-        <v-btn color="primary" @click="refreshData">Tải lại</v-btn>
+        <v-btn class="mx-2" :class="{ 'custom-loader': isLoading }" fab dark small color="cyan" @click="fetchUser">
+          <v-icon dark> mdi-cached </v-icon>
+        </v-btn>
       </v-card-title>
 
       <!-- Data Table -->
-      <v-data-table :headers="headers" :items="users" :items-per-page="10" :footer-props="{ 'items-per-page-options': [] }" class="elevation-1">
-        <!-- Custom Gender Column -->
+      <v-data-table
+        :loading="isLoading"
+        :headers="headers"
+        :items="users"
+        :items-per-page="pageSize"
+        :page.sync="page"
+        :server-items-length="totalElements"
+        :options.sync="options"
+        @update:options="fetchUser"
+        @update:items-per-page="updatePageSize"
+        :footer-props="{ itemsPerPageOptions: [10, 20, 50] }"
+        class="elevation-1"
+      >
+        <template slot="item.stt" slot-scope="{ index }">
+          {{ index + 1 + (page - 1) * pageSize }}
+        </template>
         <template slot="item.genders" slot-scope="{ item }">
           <v-chip :color="item.genders === 'Male' ? 'blue' : 'pink'" dark>
             {{ item.genders }}
           </v-chip>
         </template>
-
-        <!-- Actions Column -->
+        <template slot="item.roles" slot-scope="{ item }">
+          <v-chip-group>
+            <v-chip v-for="role in item.roles" :key="role.id" :color="getRoleColor(role.name)" dark>
+              {{ formatRoleName(role.name) }}
+            </v-chip>
+          </v-chip-group>
+        </template>
+        <template slot="item.status" slot-scope="{ item }">
+          <v-chip :color="item.status === 'ACTIVE' ? 'green' : 'red'" dark>
+            {{ item.status === 'ACTIVE' ? 'Hoạt động' : 'Khóa' }}
+          </v-chip>
+        </template>
         <template slot="item.actions" slot-scope="{ item }">
-          <v-btn icon color="primary" @click="editUser(item)">
-            <v-icon>mdi-pencil</v-icon>
-          </v-btn>
-          <v-btn icon color="red" @click="deleteUser(item)">
-            <v-icon>mdi-delete</v-icon>
+          <v-btn v-if="item.id !== user.id" icon :color="item.status === 'ACTIVE' ? 'red' : 'green'" @click="toggleUserStatus(item)">
+            <v-icon>{{ item.status === 'ACTIVE' ? 'mdi-account-cancel' : 'mdi-account-check' }}</v-icon>
           </v-btn>
         </template>
       </v-data-table>
     </v-card>
+    <confirm-dialog ref="confirmDialog" :message="confirmMessage" @confirm="handleConfirm" />
+    <v-snackbar v-model="snackbar.show" :color="snackbar.color" :timeout="snackbar.timeout">
+      {{ snackbar.message }}
+    </v-snackbar>
   </v-container>
 </template>
 
 <script>
+import axios from 'axios'
+import { mapGetters } from 'vuex'
+import ConfirmDialog from '@/components/ConfirmDialog'
+
 export default {
+  components: {
+    ConfirmDialog
+  },
   data() {
     return {
       // Headers for the table
       headers: [
+        { text: 'STT', value: 'stt', align: 'start', sortable: false },
         { text: 'ID', value: 'id', align: 'start', sortable: true },
         { text: 'Họ Tên', value: 'fullname', sortable: true },
         { text: 'Email', value: 'email' },
@@ -45,56 +80,121 @@ export default {
         { text: 'Ngày sinh', value: 'birthdays' },
         { text: 'Quê quán', value: 'locales' },
         { text: 'Địa chỉ', value: 'addresses' },
+        { text: 'Vai trò', value: 'roles' },
         { text: 'Nguồn', value: 'source' },
+        { text: 'Trạng thái', value: 'status' },
         { text: '', value: 'actions', sortable: false }
       ],
-      // Example User Data
-      users: [
-        {
-          id: 1,
-          fullname: 'Test',
-          email: 'test@gmail.com',
-          phone: '0123456789',
-          genders: 'Male',
-          birthdays: '2001-02-15',
-          locales: '---',
-          addresses: 'AAA',
-          source: 'LOCAL'
-        },
-        {
-          id: 2,
-          fullname: 'Nghi Nguyễn Vĩnh',
-          email: 'vinhnghi55@gmail.com',
-          phone: '+84372739562',
-          genders: 'Male',
-          birthdays: '2001-09-02',
-          locales: '---',
-          addresses: 'Quận 7',
-          source: 'GOOGLE'
-        }
-      ]
+      users: [],
+      page: 1,
+      pageSize: 10,
+      totalElements: 0,
+      options: {},
+      isLoading: false,
+      isDialogOpen: false,
+      selectedUser: null,
+      confirmMessage: '',
+      snackbar: {
+        show: false,
+        message: '',
+        color: '',
+        timeout: 2000
+      }
     }
   },
   methods: {
-    // Method to refresh data
-    refreshData() {
-      console.log('Refresh User Data')
-      // Call API here to reload data from DB
-    },
-    // Edit user method
-    editUser(user) {
-      console.log('Edit User', user)
-      alert(`Edit user: ${user.fullname}`)
-    },
-    // Delete user method
-    deleteUser(user) {
-      console.log('Delete User', user)
-      if (confirm(`Are you sure you want to delete ${user.fullname}?`)) {
-        // Logic để xóa user trong DB
-        this.users = this.users.filter((u) => u.id !== user.id)
-        alert(`${user.fullname} has been deleted.`)
+    async fetchUser() {
+      const { sortBy, sortDesc } = this.options
+
+      const params = {
+        page: this.page - 1,
+        size: this.pageSize,
+        sort: sortBy.length ? `${sortBy[0]},${sortDesc[0] ? 'desc' : 'asc'}` : ''
       }
+
+      this.isLoading = true
+
+      try {
+        const response = await axios.get(`${process.env.VUE_APP_BE_URL}/api/admin/user/list`, {
+          params,
+          headers: {
+            Authorization: `Bearer ${this.token}`
+          }
+        })
+        this.users = response.data.content
+        this.totalElements = response.data.totalElements
+      } catch (error) {
+        console.error('Error fetching laws:', error)
+      }
+      setTimeout(() => {
+        this.isLoading = false
+      }, 1500)
+    },
+    getRoleColor(roleName) {
+      switch (roleName) {
+        case 'ROLE_ADMIN':
+          return 'red lighten-3'
+        case 'ROLE_USER':
+          return 'green lighten-3'
+        default:
+          return 'grey'
+      }
+    },
+    formatRoleName(roleName) {
+      return roleName.replace('ROLE_', '')
+    },
+    updatePageSize(newPageSize) {
+      this.pageSize = newPageSize
+      this.page = 1
+      this.fetchLaws()
+    },
+    toggleUserStatus(user) {
+      this.selectedUser = user
+      this.confirmMessage =
+        user.status === 'ACTIVE' ? `Bạn có chắc muốn khóa người dùng ${user.fullname}?` : `Bạn có chắc muốn mở khóa người dùng ${user.fullname}?`
+      this.$refs.confirmDialog.open()
+    },
+    async handleConfirm() {
+      try {
+        const action = this.selectedUser.status === 'ACTIVE' ? 'ban' : 'unban'
+        await axios.put(
+          `${process.env.VUE_APP_BE_URL}/api/admin/user/${this.selectedUser.id}/${action}`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${this.token}`
+            }
+          }
+        )
+        this.fetchUser()
+        this.showSnackbar(
+          `Đã được ${action === 'ban' ? 'khóa' : 'mở khóa'} ${this.selectedUser.fullname} thành công!`,
+          action === 'ban' ? 'red' : 'green'
+        )
+      } catch (error) {
+        console.error(`Error ${this.selectedUser.status === 'ACTIVE' ? 'banning' : 'unbanning'} user:`, error)
+        this.showSnackbar(`Không thể ${this.selectedUser.status === 'ACTIVE' ? 'khóa' : 'mở khóa'} người dùng!`, 'error')
+      }
+    },
+    showSnackbar(message, color) {
+      this.snackbar.message = message
+      this.snackbar.color = color
+      this.snackbar.show = true
     }
+  },
+  watch: {
+    page() {
+      this.fetchUser()
+    }
+  },
+  computed: {
+    ...mapGetters({
+      token: 'getToken',
+      user: 'getLoginUserInfo'
+    })
+  },
+  mounted() {
+    this.fetchUser()
   }
 }
 </script>
@@ -106,5 +206,41 @@ export default {
 
 .v-data-table {
   margin-top: 16px;
+}
+.custom-loader {
+  animation: loader 1s infinite;
+  display: flex;
+}
+@-moz-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@-o-keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes loader {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

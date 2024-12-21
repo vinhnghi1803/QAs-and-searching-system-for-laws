@@ -4,8 +4,8 @@
     <v-toolbar-title>{{ title }}</v-toolbar-title>
 
     <v-spacer></v-spacer>
-
-    <v-btn v-if="!isAdmin" :href="path" color="cyan lighten-5" class="switch-btn" light>Switch to {{ endpoint }}</v-btn>
+    <v-btn v-if="isAdmin" href="/admin/users" color="cyan lighten-5" class="switch-btn" dark :disabled="isAdminRoute">Admin</v-btn>
+    <v-btn :href="path" color="cyan lighten-5" class="switch-btn" dark>Switch to {{ endpoint }}</v-btn>
     <logout-button />
   </v-app-bar>
 </template>
@@ -30,7 +30,10 @@ export default {
   computed: {
     ...mapGetters({
       isAdmin: 'isAdmin'
-    })
+    }),
+    isAdminRoute() {
+      return this.$route.path.startsWith('/admin')
+    }
   },
   created() {
     this.endpoint = this.$route.path === '/home' ? 'Search' : 'Chat'
@@ -49,5 +52,6 @@ export default {
 .switch-btn {
   margin-right: 8px;
   text-transform: none;
+  color: #000 !important;
 }
 </style>

@@ -28,6 +28,7 @@
             </v-text-field>
 
             <v-btn class="mb-5 px-7 font-weight-bold text-button" large type="submit" rounded color="success">Sign In</v-btn>
+            <v-alert v-if="errorMessage" type="error">{{ errorMessage }}</v-alert>
 
             <div><span class="font-italic">or Sign In with</span></div>
             <SocialLogin />
@@ -58,7 +59,8 @@ export default {
     return {
       email: '',
       password: '',
-      Bus: JSON.stringify(Bus)
+      Bus: JSON.stringify(Bus),
+      errorMessage: ''
     }
   },
   computed: {
@@ -83,11 +85,16 @@ export default {
           if (result.status == 200 && result.data) {
             store.commit('setLoginUser', result.data)
             this.$router.push(this.isAdmin ? { name: 'ManageUsers' } : { name: 'Home' })
-          } else {
-            console.error('Login failed', result)
           }
         } catch (error) {
           console.error('Login failed', error)
+          if (error.response.status == 401) {
+            this.errorMessage = 'Sai tên đăng nhập hoặc mật khẩu'
+          } else if (error.response.status == 403) {
+            this.errorMessage = 'Tài khoản của bạn bị khóa'
+          } else {
+            this.errorMessage = 'Đã có lỗi xảy ra, vui lòng thử lại sau'
+          }
         }
       }
     }
