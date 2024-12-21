@@ -9,6 +9,9 @@ import Animate from '@/views/Animate.vue'
 import SignUp from '@/views/SignUp.vue'
 import Laws from '@/views/laws'
 import LawDetail from '@/views/laws/Detail.vue'
+import AdminLayout from '@/views/admin/AdminLayout'
+import NotFound from '@/views/NotFound'
+import { ROLE_ADMIN } from '@/config/const'
 
 Vue.use(Router)
 
@@ -57,11 +60,59 @@ let routes = [
   },
   {
     path: '/laws/:id',
-    name: 'LawDetail',
+    name: 'Law Detail',
     component: LawDetail,
     meta: {
       requiresAuth: true
     }
+  },
+
+  //ADMIN route
+  {
+    path: '/admin',
+    component: AdminLayout,
+    meta: {
+      requiresAuth: true,
+      roles: [ROLE_ADMIN]
+    },
+    children: [
+      {
+        path: '',
+        redirect: 'users'
+      },
+      {
+        path: 'users',
+        name: 'ManageUsers',
+        component: () => import('@/views/admin/ManageUsers.vue'),
+        meta: {
+          requiresAuth: true,
+          roles: [ROLE_ADMIN]
+        }
+      },
+      {
+        path: 'statistics',
+        name: 'Statistics',
+        component: () => import('@/views/admin/Statistics.vue'),
+        meta: {
+          requiresAuth: true,
+          roles: [ROLE_ADMIN]
+        }
+      },
+      {
+        path: 'law-documents',
+        name: 'LawDocuments',
+        component: () => import('@/views/admin/LawDocuments.vue'),
+        meta: {
+          requiresAuth: true,
+          roles: [ROLE_ADMIN]
+        }
+      }
+    ]
+  },
+  {
+    path: '/404',
+    name: 'Not Found',
+    component: NotFound
   }
 ]
 const router = new Router({
@@ -71,13 +122,26 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   const currentUser = store.getters.getLoginUserInfo
-  console.log(currentUser)
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
+  const requiredRoles = to.meta.roles || [] // Roles yêu cầu
 
-  if (requiresAuth && !currentUser) next('/login')
-  else if (to.path === '/login' && currentUser) next('/animate')
-  else if (!requiresAuth && currentUser) next('/home')
-  else next()
+  // Kiểm tra yêu cầu đăng nhập
+  if (requiresAuth && !currentUser) {
+    next('/login') // Chưa đăng nhập, chuyển đến trang login
+  } else if (to.path === '/login' && currentUser) {
+    next('/animate') // Nếu đã đăng nhập, chuyển đến trang Animate
+  } else if (requiresAuth && requiredRoles.length > 0) {
+    // Kiểm tra quyền truy cập cho role admin
+    const userRoles = currentUser.roles || []
+    const hasRole = requiredRoles.some((role) => userRoles.includes(role))
+    if (!hasRole) {
+      next({ name: 'Not Found' })
+    } else {
+      next()
+    }
+  } else {
+    next()
+  }
 })
 
 router.afterEach((to) => {

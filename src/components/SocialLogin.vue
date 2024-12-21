@@ -34,7 +34,14 @@
 <script>
 import firebase from '../firebase'
 import axios from 'axios'
+import { mapGetters } from 'vuex'
+
 export default {
+  computed: {
+    ...mapGetters({
+      isAdmin: 'isAdmin'
+    })
+  },
   methods: {
     async handleGoogleLogin() {
       const provider = new firebase.auth.GoogleAuthProvider()
@@ -48,10 +55,6 @@ export default {
       try {
         const result = await firebase.auth().signInWithPopup(provider)
         const user = result.user
-        console.log(result)
-        console.log(result.user.getIdToken())
-        console.log(await firebase.auth().currentUser.getIdToken(/* forceRefresh */ true))
-        // console.log(result.credential)
         const token = {
           providerId: result.credential.providerId,
           accessToken: result.credential.accessToken,
@@ -61,8 +64,7 @@ export default {
 
         // Store the refresh token in session storage
         sessionStorage.setItem('GoogleToken', JSON.stringify(token))
-        console.log(user.email)
-        console.log(typeof user.email)
+
         const response = await axios.get(`${process.env.VUE_APP_BE_URL}/api/auth/existsByEmail`, {
           params: {
             email: user.email
@@ -75,10 +77,8 @@ export default {
             // Verify the token after successful Google login
             const tokenVerificationResult = await this.verifyToken(token.idTokenFireBase)
             // Handle token verification result if needed
-            console.log(tokenVerificationResult)
-
             this.$store.commit('setLoginUser', tokenVerificationResult)
-            this.$router.push('/home')
+            this.$router.push(this.isAdmin ? { name: 'ManageUsers' } : { name: 'Home' })
           } catch (error) {
             // Handle token verification error
             console.error('Error verifying token:', error)
@@ -92,7 +92,7 @@ export default {
       try {
         const response = await axios.post(`${process.env.VUE_APP_BE_URL}/api/auth/verifyToken`, firebaseToken)
         // Handle successful response
-        console.log(response.data) // Print response data to console
+        // console.log(response.data)
         return response.data // Return response data if needed
       } catch (error) {
         // Handle error

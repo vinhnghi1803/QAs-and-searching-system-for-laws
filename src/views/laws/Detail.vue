@@ -2,7 +2,7 @@
   <v-container>
     <v-row justify="center">
       <v-col cols="12" md="8">
-        <v-card :loading="loading" elevation="1" class="law-detail-card">
+        <v-card :loading="loading" elevation="0" class="law-detail-card">
           <!-- Nút quay lại -->
           <v-card-actions>
             <v-btn text class="back-btn" @click="$router.go(-1)"> <v-icon left>mdi-arrow-left</v-icon>Quay lại danh sách </v-btn>

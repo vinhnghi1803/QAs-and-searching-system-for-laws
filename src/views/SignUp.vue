@@ -159,7 +159,7 @@ export default {
           if (result.status == 200 && result.data) {
             store.commit('setLoginUser', result.data)
             this.$router.push({ name: 'Home' })
-            console.log('Login successful', result.data)
+            // console.log('Login successful', result.data)
           }
           // else {
           //   console.error('Login failed', result)
@@ -186,8 +186,8 @@ export default {
     let GoogleToken = sessionStorage.getItem('GoogleToken')
     if (GoogleToken) {
       let accessToken = JSON.parse(GoogleToken).accessToken
-      console.log(accessToken)
-      console.log(this.googleLogin)
+      // console.log(accessToken)
+      // console.log(this.googleLogin)
 
       await getGoogleUserInfo(this.signupData, this.googleLogin, accessToken)
     }

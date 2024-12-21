@@ -35,4 +35,8 @@ const mapCategoryIcons = (categories) => {
   }))
 }
 
-export { mapCategoryIcons }
+// ROLE CONSTANT
+const ROLE_USER = 'ROLE_USER'
+const ROLE_ADMIN = 'ROLE_ADMIN'
+
+export { mapCategoryIcons, ROLE_USER, ROLE_ADMIN }

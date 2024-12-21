@@ -11,7 +11,7 @@ export async function getGoogleUserInfo(signupData, googleLogin, accessToken) {
       }
     )
     const responseData = JSON.parse(rawGoogleInfo.request.response)
-    console.log(responseData)
+    // console.log(responseData)
     signupData.fullName = responseData.names?.[0].displayName || ''
     signupData.email = responseData.emailAddresses?.[0].value || ''
     signupData.phone = responseData.phoneNumbers?.[0].canonicalForm || ''
@@ -47,6 +47,6 @@ export async function decodeGoogleIDToken(token) {
 
 export function parseDate(day, month, year) {
   const birthdays = new Date(parseInt(year), parseInt(month) - 1, parseInt(day))
-  console.log(new Date(birthdays - new Date().getTimezoneOffset() * 60000).toISOString().substr(0, 10))
+  // console.log(new Date(birthdays - new Date().getTimezoneOffset() * 60000).toISOString().substr(0, 10))
   return new Date(birthdays - new Date().getTimezoneOffset() * 60000).toISOString().substr(0, 10)
 }

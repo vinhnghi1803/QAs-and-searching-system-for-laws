@@ -159,7 +159,7 @@ export default {
       }
     },
     viewLaw(law) {
-      this.$router.push({ name: 'LawDetail', params: { id: law.id } })
+      this.$router.push({ name: 'Law Detail', params: { id: law.id } })
     },
     async fetchLawsCategories() {
       try {

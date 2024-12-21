@@ -5,13 +5,14 @@
 
     <v-spacer></v-spacer>
 
-    <v-btn :href="path" color="cyan lighten-5" class="switch-btn" light>Switch to {{ endpoint }}</v-btn>
+    <v-btn v-if="!isAdmin" :href="path" color="cyan lighten-5" class="switch-btn" light>Switch to {{ endpoint }}</v-btn>
     <logout-button />
   </v-app-bar>
 </template>
 
 <script>
 import LogoutButton from '@/components/LogoutButton.vue'
+import { mapGetters } from 'vuex'
 
 export default {
   components: {
@@ -26,9 +27,15 @@ export default {
       endpoint: ''
     }
   },
+  computed: {
+    ...mapGetters({
+      isAdmin: 'isAdmin'
+    })
+  },
   created() {
     this.endpoint = this.$route.path === '/home' ? 'Search' : 'Chat'
     this.path = this.$route.path === '/home' ? '/laws' : '/home'
+    console.log
   },
   methods: {
     toggleDrawer() {

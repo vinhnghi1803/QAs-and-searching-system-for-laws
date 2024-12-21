@@ -47,6 +47,7 @@ import SocialLogin from '@/components/SocialLogin'
 import axios from 'axios'
 import store from '@/store/store'
 import Bus from '../assets/animation/Bus.json'
+import { mapGetters } from 'vuex'
 
 export default {
   name: 'login',
@@ -61,6 +62,9 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({
+      isAdmin: 'isAdmin'
+    }),
     emailRules() {
       return [(v) => !!v || 'E-mail is required', (v) => /.+@.+\..+/.test(v) || 'E-mail must be valid']
     },
@@ -78,8 +82,7 @@ export default {
           })
           if (result.status == 200 && result.data) {
             store.commit('setLoginUser', result.data)
-            this.$router.push({ name: 'Home' })
-            console.log('Login successful', result.data)
+            this.$router.push(this.isAdmin ? { name: 'ManageUsers' } : { name: 'Home' })
           } else {
             console.error('Login failed', result)
           }
