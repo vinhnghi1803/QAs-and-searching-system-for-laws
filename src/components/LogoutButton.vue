@@ -1,5 +1,5 @@
 <template>
-  <v-btn @click="logout" color="red" dark>Logout</v-btn>
+  <v-btn @click="logout" color="red" dark>Đăng xuất</v-btn>
 </template>
 
 <script>
@@ -18,8 +18,4 @@ export default {
   }
 }
 </script>
-<style scoped>
-.v-btn {
-  text-transform: none;
-}
-</style>
+<style scoped></style>

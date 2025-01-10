@@ -122,7 +122,6 @@ export default {
   margin-right: 16px;
 }
 .v-btn {
-  text-transform: none;
   font-size: 20px;
   font-weight: bolder;
 }

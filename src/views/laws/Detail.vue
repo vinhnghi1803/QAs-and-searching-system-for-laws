@@ -64,14 +64,13 @@ export default {
   background-color: #1e1e2f;
   color: white;
   padding: 16px;
-  border-radius: 8px; /* Bo góc nhẹ */
+  border-radius: 8px;
 }
 
 /* Nút quay lại */
 .back-btn {
   font-size: 14px;
-  font-weight: 500; /* Làm nổi bật chữ nhẹ */
-  text-transform: none;
+  font-weight: 500;
 }
 
 .back-btn v-icon {
@@ -89,7 +88,7 @@ export default {
 /* Loại luật */
 .subtitle {
   font-size: 16px;
-  text-align: left; /* Giữ nguyên align text left */
+  text-align: left;
   margin-bottom: 16px;
 }
 

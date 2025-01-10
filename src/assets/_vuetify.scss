@@ -1,24 +1,3 @@
-// /* Text Field */
-// .v-input {
-//   margin-bottom: 20px;
-// }
-// .v-text-field__slot {
-//   .v-label {
-//     left: 0px !important;
-//     right: auto !important;
-//   }
-// }
-// .v-input--is-label-active,
-// .v-input--is-focused {
-//   .v-label.v-label--active {
-//     left: 0px !important;
-//     right: auto !important;
-//     transform: translateY(-28px) translateX(-6px) !important;
-//     font-size: 12px;
-//   }
-// }
-// .v-text-field__details {
-//   .v-messages__message {
-//     color: red;
-//   }
-// }
+.v-btn {
+  text-transform: none;
+}

@@ -113,6 +113,22 @@ let routes = [
     path: '/404',
     name: 'Not Found',
     component: NotFound
+  },
+  {
+    path: '/payment-result',
+    name: 'payment-result',
+    meta: {
+      requiresAuth: true
+    },
+    beforeEnter: (to, from, next) => {
+      const previousUrl = localStorage.getItem('previousUrl')
+      if (previousUrl) {
+        localStorage.removeItem('previousUrl')
+        next({ path: previousUrl })
+      } else {
+        next()
+      }
+    }
   }
 ]
 const router = new Router({
@@ -123,7 +139,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   const currentUser = store.getters.getLoginUserInfo
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
-  const requiredRoles = to.meta.roles || [] // Roles yêu cầu
+  const requiredRoles = to.meta.roles || []
 
   // Kiểm tra yêu cầu đăng nhập
   if (requiresAuth && !currentUser) {

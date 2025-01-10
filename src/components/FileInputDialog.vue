@@ -37,8 +37,8 @@
 
       <v-card-actions class="action">
         <v-spacer></v-spacer>
-        <v-btn class="normal-btn" rounded dark color="primary" @click="submitFile" :disabled="isLoading">Tải lên</v-btn>
-        <v-btn class="normal-btn" rounded dark color="red" @click="close" :disabled="isLoading">Hủy</v-btn>
+        <v-btn rounded dark color="primary" @click="submitFile" :disabled="isLoading">Tải lên</v-btn>
+        <v-btn rounded dark color="red" @click="close" :disabled="isLoading">Hủy</v-btn>
       </v-card-actions>
       <v-progress-linear v-if="isLoading" indeterminate color="primary"></v-progress-linear>
     </v-card>
@@ -140,9 +140,6 @@ export default {
 }
 .headline {
   font-weight: bold;
-}
-.normal-btn {
-  text-transform: none;
 }
 .action {
   padding-bottom: 20px !important;

@@ -2,12 +2,16 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { setStore, getStore } from '@/config/utils'
 import { ROLE_ADMIN } from '@/config/const'
+import balance from '@/store/balance'
 
 Vue.use(Vuex)
 
 const user = getStore('user')
 
 export default new Vuex.Store({
+  modules: {
+    balance
+  },
   state: {
     loginUser: user,
     token: user?.token,

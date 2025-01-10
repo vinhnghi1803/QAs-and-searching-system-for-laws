@@ -166,10 +166,6 @@ export default {
   margin-top: 16px;
 }
 
-.normal-btn {
-  text-transform: none;
-}
-
 .custom-loader {
   animation: loader 1s infinite;
   display: flex;

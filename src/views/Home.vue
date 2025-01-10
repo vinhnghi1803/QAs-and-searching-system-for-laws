@@ -216,6 +216,7 @@ export default {
           if (this.messages.length === 3) {
             await this.fetchUserSessions()
           }
+          this.$store.dispatch('fetchBalance')
           this.scrollToBottom()
         } catch (error) {
           console.error('Error sending message:', error)
@@ -259,11 +260,6 @@ export default {
 .container {
   .v-sheet.v-card:not(.v-sheet--outlined) {
     box-shadow: none;
-  }
-}
-.v-navigation-drawer {
-  .v-btn {
-    text-transform: none;
   }
 }
 </style>

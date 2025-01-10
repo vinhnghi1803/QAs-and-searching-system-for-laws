@@ -6,20 +6,47 @@
     <v-spacer></v-spacer>
     <v-btn v-if="isAdmin" href="/admin/users" color="cyan lighten-5" class="switch-btn" dark :disabled="isAdminRoute">Admin</v-btn>
     <v-btn :href="path" color="cyan lighten-5" class="switch-btn" dark>Switch to {{ endpoint }}</v-btn>
-    <logout-button />
+    <v-menu bottom min-width="200px" rounded offset-y :nudge-top="-15">
+      <template v-slot:activator="{ on }">
+        <v-btn icon x-large v-on="on">
+          <v-avatar color="indigo" dark>
+            <v-icon dark> mdi-account-circle </v-icon>
+          </v-avatar>
+        </v-btn>
+      </template>
+      <v-card>
+        <v-list-item-content class="justify-center">
+          <div class="mx-auto text-center">
+            <h5 class="mt-1">{{ user.fullName }}</h5>
+            <h5 class="mt-1">{{ user.email }}</h5>
+            <p class="text-caption mt-1">Số dư: {{ balance }}</p>
+            <v-divider class="my-3"></v-divider>
+            <v-layout column>
+              <v-btn disabled depressed rounded text> Đổi mật khẩu </v-btn>
+              <v-btn depressed rounded @click="openDepositDialog"> Nạp tiền (Momo) </v-btn>
+            </v-layout>
+            <v-divider class="my-3"></v-divider>
+            <logout-button />
+          </div>
+        </v-list-item-content>
+      </v-card>
+    </v-menu>
+    <momo-payment ref="depositDialog" />
   </v-app-bar>
 </template>
 
 <script>
 import LogoutButton from '@/components/LogoutButton.vue'
 import { mapGetters } from 'vuex'
+import MomoPayment from '@/views/momo/MomoPayment.vue'
 
 export default {
   components: {
-    LogoutButton
+    LogoutButton,
+    MomoPayment
   },
   props: {
-    title: { type: String, require: true }
+    title: { type: String, required: true }
   },
   data() {
     return {
@@ -29,7 +56,10 @@ export default {
   },
   computed: {
     ...mapGetters({
-      isAdmin: 'isAdmin'
+      isAdmin: 'isAdmin',
+      user: 'getLoginUserInfo',
+      token: 'getToken',
+      balance: 'getBalance'
     }),
     isAdminRoute() {
       return this.$route.path.startsWith('/admin')
@@ -38,11 +68,14 @@ export default {
   created() {
     this.endpoint = this.$route.path === '/home' ? 'Search' : 'Chat'
     this.path = this.$route.path === '/home' ? '/laws' : '/home'
-    console.log
+    this.$store.dispatch('fetchBalance')
   },
   methods: {
     toggleDrawer() {
       this.$emit('toggle-drawer')
+    },
+    openDepositDialog() {
+      this.$refs.depositDialog.open()
     }
   }
 }
@@ -51,7 +84,6 @@ export default {
 <style scoped>
 .switch-btn {
   margin-right: 8px;
-  text-transform: none;
   color: #000 !important;
 }
 </style>
