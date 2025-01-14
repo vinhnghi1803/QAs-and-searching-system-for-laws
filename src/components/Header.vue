@@ -23,6 +23,8 @@
             <v-divider class="my-3"></v-divider>
             <v-layout column>
               <v-btn disabled depressed rounded text> Đổi mật khẩu </v-btn>
+              <v-btn depressed rounded @click="openTransactionHistoryDialog"> Lịch sử giao dịch </v-btn>
+              <v-btn depressed rounded @click="openStatisticsDialog"> Thống kê </v-btn>
               <v-btn depressed rounded @click="openDepositDialog"> Nạp tiền (Momo) </v-btn>
             </v-layout>
             <v-divider class="my-3"></v-divider>
@@ -32,18 +34,24 @@
       </v-card>
     </v-menu>
     <momo-payment ref="depositDialog" />
+    <transaction-history ref="transactionHistoryDialog" />
+    <statistics ref="statisticsDialog" />
   </v-app-bar>
 </template>
 
 <script>
 import LogoutButton from '@/components/LogoutButton.vue'
 import { mapGetters } from 'vuex'
-import MomoPayment from '@/views/momo/MomoPayment.vue'
+import MomoPayment from '@/views/transaction/MomoPayment.vue'
+import TransactionHistory from '@/views/transaction/TransactionHistory.vue'
+import Statistics from '@/views/transaction/Statistics.vue'
 
 export default {
   components: {
     LogoutButton,
-    MomoPayment
+    MomoPayment,
+    TransactionHistory,
+    Statistics
   },
   props: {
     title: { type: String, required: true }
@@ -76,6 +84,12 @@ export default {
     },
     openDepositDialog() {
       this.$refs.depositDialog.open()
+    },
+    openTransactionHistoryDialog() {
+      this.$refs.transactionHistoryDialog.open()
+    },
+    openStatisticsDialog() {
+      this.$refs.statisticsDialog.open()
     }
   }
 }
