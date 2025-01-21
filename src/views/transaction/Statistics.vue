@@ -37,8 +37,6 @@ export default {
       isOpen: false,
       date: new Date().toISOString().substr(0, 7),
       picker: false,
-      noData: 'Không có dữ liệu',
-      transitionList: [],
       isLoading: false,
       series: [],
       chartOptions: {
@@ -82,6 +80,15 @@ export default {
             fontSize: '18px'
           },
           align: 'center'
+        },
+        noData: {
+          text: 'Không có dữ liệu',
+          align: 'center',
+          verticalAlign: 'middle',
+          style: {
+            fontSize: '18px',
+            fontFamily: 'Roboto, sans-serif'
+          }
         }
       }
     }
@@ -120,7 +127,10 @@ export default {
         const categories = Array.from({ length: daysInMonth }, (_, i) => (i + 1).toString().padStart(2, '0'))
         const requestData = categories.map((date) => data[`${year}-${month}-${date}`] || 0)
 
-        this.series = [{ name: 'Request', data: requestData }]
+        const allZero = requestData.every((value) => value === 0)
+
+        // this.series = [{ name: 'Request', data: requestData }]
+        this.series = allZero ? [] : [{ name: 'Request', data: requestData }]
         this.chartOptions.xaxis.categories = categories
       } catch (error) {
         console.error('Lỗi khi gọi API:', error)
