@@ -114,7 +114,7 @@ export default {
       this.loading = true
 
       try {
-        const response = await axios.get(`${process.env.VUE_APP_BE_URL}/api/docs/search`, {
+        const response = await axios.get(`${process.env.VUE_APP_BE_URL}/api/docs/hybrid-search`, {
           params,
           headers: {
             Authorization: `Bearer ${this.user.token}`
