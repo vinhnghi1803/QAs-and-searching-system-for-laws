@@ -2,7 +2,7 @@ import firebase from 'firebase/compat/app'
 import 'firebase/compat/auth' // Import the Firebase Authentication library
 
 const firebaseConfig = {
-  apiKey: 'AIzaSyDTpmxMJVPUJjz0L84hXrcTkQ3LGzT8dcs',
+  apiKey: '',
   authDomain: 'social-connection-bc44b.firebaseapp.com',
   projectId: 'social-connection-bc44b',
   storageBucket: 'social-connection-bc44b.appspot.com',
